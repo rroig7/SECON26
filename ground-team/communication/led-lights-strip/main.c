@@ -13,13 +13,13 @@ int main(){
 
     photoresistor_t pt;
     init_ldr(handle ,&pt, LDR_PIN);
-    calibrate_ldr(&pt);
-    int ldr_reading;
+    // calibrate_ldr(&pt);
+    long int ldr_reading;
     read_ldr(&pt, &ldr_reading);
 
     while(1){
         read_ldr(&pt, &ldr_reading);
-        printf("LDR Reading (0=LOW, 1=HIGH): %d\n", ldr_reading);
+        printf("LDR Reading: %d\n", ldr_reading);
         // printf("Baseline Reading: %f");
         // printf("Threshold Reading: %f");
         usleep(100000);

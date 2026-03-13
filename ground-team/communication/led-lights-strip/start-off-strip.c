@@ -36,15 +36,25 @@ status_t read_ldr(photoresistor_t *ph, int *value)
         return ERR_INIT_REQUIRED;
     }
 
-    int reading = lgGpioRead(ph->gpio_handle, ph->pin);
+    unsigned long int count = 0;
 
-    if (reading < 0)
-        return ERR_READ_FAIL;
+    // Discharge capacitor
+    lgGpioClaimOutput(ph->gpio_handle, 0, ph->pin, 0);
+    usleep(10000);  // 10ms discharge
 
-    *value = reading;
+    // Switch to input and measure charge time
+    lgGpioClaimInput(ph->gpio_handle, 0, ph->pin);
+    while (lgGpioRead(ph->gpio_handle, ph->pin) == 0)
+    {
+        count++;
+    }
+
+    *value = count;
 
     return OK;
 }
+
+
 
 status_t calibrate_ldr(photoresistor_t *ph)
 {
