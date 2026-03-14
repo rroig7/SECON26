@@ -87,6 +87,8 @@ status_t calibrate_ldr(photoresistor_t *ph)
     printf("[LDR] Calibration complete. Average: %f (from %d samples), saved to %s\n",
            average, samples, LDR_CALIBRATION_FILE);
 
+    ph->calibration_val = (int)average;
+
     return OK;
 }
 

@@ -13,14 +13,21 @@ int main(){
 
     photoresistor_t pt;
     init_ldr(handle ,&pt, LDR_PIN);
-    // calibrate_ldr(&pt);
+    if (access("ldr_calibration", F_OK) != 1) {
+        calibrate_ldr(&pt);
+    } 
+
     unsigned long int ldr_reading = 0;
+    int calibration_offset = 0;
     read_ldr(&pt, &ldr_reading);
 
     while(1){
         read_ldr(&pt, &ldr_reading);
         printf("LDR Reading: %ld\n", ldr_reading);
-        // printf("Baseline Reading: %f");
+        printf("Baseline Reading: %f", pt.calibration_val);
+        if (ldr_reading + calibration_offset > pt.calibration_val){
+            printf("[INFO] ROBOT GO!")
+        }
         // printf("Threshold Reading: %f");
         usleep(100000);
     }

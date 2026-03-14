@@ -22,6 +22,8 @@
 typedef struct{
     unsigned int pin;
     int gpio_handle;
+    int calibration_val;
+    int threshold;
 } photoresistor_t;
 
 status_t init_ldr(int gpio_handle, photoresistor_t *ph, int pin);
