@@ -29,7 +29,7 @@ status_t init_ldr(int gpio_handle, photoresistor_t *ph, int pin)
 }
 
 
-status_t read_ldr(photoresistor_t *ph, int *value)
+status_t read_ldr(photoresistor_t *ph, unsigned long int *value)
 {
     if (ph == NULL || value == NULL) {
         printf("[ERROR] Initialize photoresistor and pass in value to store reading\n");
@@ -61,8 +61,32 @@ status_t calibrate_ldr(photoresistor_t *ph)
     if (ph == NULL)
         return ERR_INIT_REQUIRED;
 
-    // For now, no calibration logic is needed to read
-    // digital HIGH/LOW values from the GPIO pin.
+    const int samples = 1000;
+    unsigned long sum = 0;
+
+    for (int i = 0; i < samples; i++) {
+        unsigned long value;
+        status_t rc = read_ldr(ph, &value);
+        if (rc != OK) {
+            printf("[ERROR] Failed to read LDR during calibration at sample %d\n", i);
+            return rc;
+        }
+        sum += value;
+    }
+
+    double average = (double)sum / (double)samples;
+
+    FILE *file = fopen(LDR_CALIBRATION_FILE, "w");
+    if (file == NULL) {
+        printf("[ERROR] Failed to open calibration file '%s' for writing\n", LDR_CALIBRATION_FILE);
+        return ERR_WRITE_FAIL;
+    }
+    fprintf(file, "%f\n", average);
+    fclose(file);
+
+    printf("[LDR] Calibration complete. Average: %f (from %d samples), saved to %s\n",
+           average, samples, LDR_CALIBRATION_FILE);
+
     return OK;
 }
 
